@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login or Create Account</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    /* Custom styles */
+    .toggle-password {
+      position: absolute;
+      right: 0;
+      top: 0.8rem;
+      cursor: pointer;
+    }
+
+    #navbar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    #navbar .nav-wrapper {
+      width: 100%;
+    }
+
+    #navbar .nav-wrapper ul {
+      float: right;
+      margin-right: 20px;
+    }
+
+    #navbar .nav-wrapper ul li {
+      display: inline-block;
+    }
+
+    #navbar .nav-wrapper ul li a {
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="nav-wrapper">
+    <a href="#" class="brand-logo">Logo</a>
+    <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Search</a></li>
+      <li><a href="#">Profile</a></li>
+      <li><a href="#">Settings</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="row">
+    <div class="col s12 m6 offset-m3">
+      <div class="card" id="login-section">
+        <div class="card-content">
+          <span class="card-title center-align">Login</span>
+          <div class="input-field">
+            <input id="username" type="text" class="validate">
+            <label for="username">Username</label>
+          </div>
+          <div class="input-field">
+            <input id="password-login" type="password" class="validate" required>
+            <label for="password-login">Password</label>
+            <!-- Password visibility toggle icon -->
+            <i class="material-icons prefix toggle-password" onclick="togglePassword('password-login')">visibility_off</i>
+          </div>
+          <button class="btn waves-effect waves-light" type="submit" name="action" onclick="login()">Login</button>
+          <p class="center-align">Don't have an account? <a href="#create-account-modal" class="modal-trigger">Create one</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Account Modal -->
+<div id="create-account-modal" class="modal">
+  <div class="modal-content">
+    <h4>Create Account</h4>
+    <div class="input-field">
+      <input id="fullname" type="text" class="validate" required>
+      <label for="fullname">Full Name</label>
+    </div>
+    <div class="input-field">
+      <input id="dob" type="text" class="validate" required>
+      <label for="dob">Date of Birth (DD/MM/YYYY)</label>
+    </div>
+    <div class="input-field">
+      <select id="relationship-status">
+        <option value="" disabled selected>Choose your relationship status</option>
+        <option value="married">Married</option>
+        <option value="single">Single</option>
+      </select>
+      <label>Relationship Status</label>
+    </div>
+    <div class="input-field">
+      <input id="email" type="email" class="validate" required>
+      <label for="email">Email</label>
+    </div>
+    <div class="input-field">
+      <input id="password" type="password" class="validate" required>
+      <label for="password">Create Password</label>
+      <!-- Password visibility toggle icon -->
+      <i class="material-icons prefix toggle-password" onclick="togglePassword('password')">visibility_off</i>
+    </div>
+    <div class="input-field">
+      <input id="confirm-passport" type="password" class="validate" required>
+      <label for="confirm-passport">Confirm Password</label>
+    </div>
+    <button class="btn waves-effect waves-light" type="submit" name="action" onclick="createAccount()">Create Account</button>
+    <!-- Save Passport to Google Button -->
+    <button class="btn waves-effect waves-light" type="submit" name="action" onclick="savePassportToGoogle()">Save Passport to Google</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modals = document.querySelectorAll('.modal');
+    M.Modal.init(modals);
+
+    const selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+  });
+
+  function togglePassword(inputId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = passwordInput.parentElement.querySelector('.toggle-password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    toggleIcon.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+  }
+
+  // Simulated user authentication logic
+  function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password-login').value;
+    // Simulate checking against hardcoded credentials (replace with actual logic)
+    const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+    const account = accounts.find(acc => acc.email === username && acc.password === password);
+    if (account) {
+      // Show the navbar
+      document.getElementById('navbar').style.display = 'block';
+      document.getElementById('login-section').style.display = 'none'; // Hide the login section
+    } else {
+      // Show error message (replace with actual error handling)
+      alert('Invalid username or password');
+    }
+  }
+
+  function createAccount() {
+    const fullname = document.getElementById('fullname').value;
+    const dob = document.getElementById('dob').value;
+    const relationshipStatus = document.getElementById('relationship-status').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassport = document.getElementById('confirm-passport').value;
+    
+    if (password !== confirmPassport) {
+      alert('Passwords do not match');
+      return;
+    }
+    
+    // Check if email is already registered
+    const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+    const existingAccount = accounts.find(acc => acc.email === email);
+    if (existingAccount) {
+      alert('An account with this email already exists');
+      return;
+    }
+    
+    // Simulate account creation by storing in localStorage (replace with actual logic)
+    const newAccount = {
+      fullname,
+      dob,
+      relationshipStatus,
+      email,
+      password
+    };
+    accounts.push(newAccount);
+    localStorage.setItem('accounts', JSON.stringify(accounts));
+
+    // Simulate successful creation and prompt user to login
+    alert('Account created successfully. Please log in.');
+    // Close modal
+    const modal = M.Modal.getInstance(document.getElementById('create-account-modal'));
+    modal.close();
+  }
+
+  function savePassportToGoogle() {
+    // Implement save passport to Google feature here
+    alert('Saving passport to Google...');
+  }
+</script>
+</body>
+</html>
